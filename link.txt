@@ -1,0 +1,5 @@
+link github
+https://github.com/mzakyfrz17/a433-microservices.git
+
+link docker hub
+https://hub.docker.com/r/mzakyfrz/item-app

@@ -1,0 +1,23 @@
+# menggunakan version 2
+version: '2'
+
+services:
+# mengatur service untuk container item-app
+  item-app:
+    image: mzakyfrz/item-app:v1
+    restart: always
+    ports:
+      - "80:8080"
+    depends_on:
+      - item-db
+
+# mengatur service untuk container item-db
+  item-db:
+    image: mongo:3
+    restart: always
+    volumes:
+      - app-db:/data/db
+
+# mengatur bridge volume untuk item-db
+volumes:
+  app-db:
