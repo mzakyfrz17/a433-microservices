@@ -1,0 +1,35 @@
+# Versi API yang digunakan untuk membuat objek Deployment
+apiVersion: apps/v1
+# Jenis objek Kubernetes yang ingin dibuat, yaitu Deployment
+kind: Deployment
+metadata:
+  # Nama dari Deployment
+  name: karsajobs-ui-deployment
+  labels:
+    # Label untuk Deployment
+    app: karsajobs-ui 
+spec:
+  # Jumlah replika yang akan dibuat
+  replicas: 2 
+  selector:
+    matchLabels: 
+      # Memilih pod dengan label "app: karsajobs-ui"
+      app: karsajobs-ui 
+  template: 
+    metadata:
+      labels:
+        # Label yang akan diberikan pada pod
+        app: karsajobs-ui
+    spec: 
+      containers:
+        - name: karsajobs-ui
+          # Image yang akan digunakan untuk container
+          image: ghcr.io/mzakyfrz17/a433-microservices/karsajobs-ui:latest
+          ports:
+            # Port yang di-expose oleh container
+            - containerPort: 8000 
+          env:
+            # Variabel lingkungan untuk aplikasi di dalam container
+            - name: VUE_APP_BACKEND
+              # Nilai variabel yang mengarah ke backend URL
+              value: http://192.168.39.40:31539

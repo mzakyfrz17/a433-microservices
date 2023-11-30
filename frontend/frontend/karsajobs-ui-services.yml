@@ -1,0 +1,20 @@
+# Versi API yang digunakan untuk membuat objek Service
+apiVersion: v1
+# Jenis objek Kubernetes yang ingin dibuat, yaitu Service
+kind: Service
+metadata:
+  labels:
+    # Label untuk Service
+    app: karsajobs-ui
+  # Nama dari Service
+  name: karsajobs-ui-service
+spec:
+  # Konfigurasi port yang di-expose oleh Service dan diarahkan ke target port yang sama
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    # Menentukan pod mana yang akan di-serve oleh Service berdasarkan label "app: karsajobs-ui"
+    app: karsajobs-ui
+  # Jenis akses Service (dalam hal ini NodePort)
+  type: NodePort

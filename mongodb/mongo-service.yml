@@ -1,0 +1,19 @@
+# Versi API yang digunakan untuk membuat objek Service
+apiVersion: v1
+# Jenis objek Kubernetes yang ingin dibuat, yaitu Service
+kind: Service 
+metadata:
+  # Nama dari Service
+  name: mongo 
+  labels:
+    # Label untuk Service
+    app: mongo-app 
+spec:
+  # Konfigurasi port yang di-expose oleh Service
+  ports:
+    - port: 27017  # Port MongoDB
+  # Selector untuk menentukan pod yang akan di-serve oleh Service
+  selector:
+    app: mongo-app 
+  # Konfigurasi clusterIP menjadi None mengindikasikan bahwa Service tidak akan memiliki clusterIP
+  clusterIP: None  # Tidak ada IP Cluster untuk Service ini

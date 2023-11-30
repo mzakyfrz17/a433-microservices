@@ -1,0 +1,43 @@
+# Versi API yang digunakan untuk membuat objek PersistentVolume
+apiVersion: v1
+# Jenis objek Kubernetes yang ingin dibuat, yaitu PersistentVolume
+kind: PersistentVolume
+metadata:
+  # Nama dari PersistentVolume
+  name: mongo-pv 
+  labels:
+    # Label untuk PersistentVolume
+    type: local
+spec:
+  # Kelas penyimpanan yang digunakan
+  storageClassName: manual
+  # Kapasitas penyimpanan yang dialokasikan
+  capacity:
+    storage: 1Gi
+  # Mode akses ke PersistentVolume
+  accessModes:
+    - ReadWriteOnce  
+  # Lokasi pada host yang akan di-mount ke PersistentVolume
+  hostPath:
+    # Path pada host yang akan di-mount
+    path: "/data/db" 
+---
+# Objek PersistentVolumeClaim yang meminta alokasi PersistentVolume
+apiVersion: v1
+kind: PersistentVolumeClaim 
+metadata:
+  # Nama dari PersistentVolumeClaim
+  name: mongo-pv-claim
+  labels:
+    # Label untuk PersistentVolumeClaim
+    app: mongo
+spec:
+  # Kelas penyimpanan yang digunakan harus sesuai dengan yang di PersistentVolume
+  storageClassName: manual
+  # Mode akses ke PersistentVolumeClaim
+  accessModes:
+    - ReadWriteOnce
+  # Permintaan sumber daya untuk penyimpanan
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,62 @@
+# Versi API yang digunakan untuk membuat objek StatefulSet
+apiVersion: apps/v1
+# Jenis objek Kubernetes yang ingin dibuat, yaitu StatefulSet
+kind: StatefulSet
+metadata:
+  # Nama dari StatefulSet
+  name: mongo 
+  labels:
+    # Label untuk StatefulSet
+    app: mongo-app 
+spec:
+  selector:
+    matchLabels:
+      # Memilih pod dengan label "app: mongo-app" dan "tier: backend"
+      app: mongo-app 
+      tier: backend
+  serviceName: mongo 
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        # Label yang akan diberikan pada pod yang di-generate oleh StatefulSet
+        app: mongo-app 
+        tier: backend
+    spec:
+      containers:
+        - image: mongo:4.4
+          name: mongo 
+          env:
+            # Variabel lingkungan yang digunakan untuk inisialisasi MongoDB
+            - name: MONGO_INITDB_ROOT_USERNAME_FILE 
+              value: /etc/mongo-credentials/MONGO_ROOT_USERNAME
+            - name: MONGO_INITDB_ROOT_PASSWORD_FILE 
+              value: /etc/mongo-credentials/MONGO_ROOT_PASSWORD
+          ports:
+            # Port yang di-expose oleh container
+            - containerPort: 27017 
+              name: mongo
+          volumeMounts:
+            # Mounting volume ke dalam container
+            - name: mongo-persistent-volume 
+              mountPath: /data/db 
+            - name: mongo-config-map 
+              mountPath: /config 
+            - name: mongo-credentials 
+              mountPath: /etc/mongo-credentials 
+      volumes:
+        # Penggunaan PersistentVolumeClaim dalam pod
+        - name: mongo-persistent-volume 
+          persistentVolumeClaim:
+            claimName: mongo-pv-claim 
+        # Menggunakan ConfigMap dalam pod untuk konfigurasi
+        - name: mongo-config-map 
+          configMap:
+            name: mongo-config 
+            items: 
+              - key: mongo.conf 
+                path: mongo.conf 
+        # Menggunakan Secret dalam pod untuk penyimpanan kredensial
+        - name: mongo-credentials 
+          secret:
+            secretName: mongo-credentials
