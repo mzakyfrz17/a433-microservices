@@ -1,0 +1,77 @@
+# Versi Docker Compose yang digunakan
+version: "3.2"
+
+# Layanan yang akan dijalankan
+services:
+
+  # Layanan RabbitMQ
+  rabbitmq:
+    # Menggunakan gambar RabbitMQ dengan manajemen pada versi 3.11
+    image: rabbitmq:3.11-management
+    container_name: 'rabbitmq_container'
+    # Melakukan mapping port dari host ke port container RabbitMQ
+    ports:
+      - 5672:5672
+      - 15672:15672
+    # Melakukan mounting volume untuk menyimpan data dan log RabbitMQ
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    # Menghubungkan ke jaringan yang ditentukan
+    networks:
+      - rabbitmq_network
+    # Melakukan health check dengan menggunakan perintah rabbitmq-diagnostics -q ping
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+
+  # Layanan Order Service
+  order-service:
+    # Menggunakan gambar Order Service dari repository ghcr.io dengan tag latest
+    image: ghcr.io/mzakyfrz17/a433-microservices/order-service:latest
+    container_name: 'order-service'
+    # Melakukan mapping port dari host ke port container Order Service
+    ports:
+      - 3000:3000
+    # Bergantung pada layanan RabbitMQ dan akan memastikan layanan RabbitMQ sudah sehat sebelum memulai layanan ini
+    depends_on:
+      rabbitmq:
+        name: rabbitmq_container
+        condition: service_healthy
+    # Menetapkan variabel lingkungan untuk layanan Order Service
+    environment:
+      NODE_ENV: production
+      AMQP_URL: amqp://guest:guest@rabbitmq:5672
+    # Restart layanan jika terjadi kegagalan
+    restart: on-failure
+    # Menghubungkan ke jaringan yang ditentukan
+    networks:
+      - rabbitmq_network
+
+  # Layanan Shipping Service
+  shipping-service:
+    # Menggunakan gambar Shipping Service dari repository ghcr.io dengan tag latest
+    image: ghcr.io/mzakyfrz17/a433-microservices/shipping-service:latest
+    container_name: 'shipping-service'
+    # Melakukan mapping port dari host ke port container Shipping Service
+    ports:
+      - 3001:3001
+    # Bergantung pada layanan RabbitMQ dan akan memastikan layanan RabbitMQ sudah sehat sebelum memulai layanan ini
+    depends_on:
+      rabbitmq:
+        name: rabbitmq_container
+        condition: service_healthy
+    # Menetapkan variabel lingkungan untuk layanan Shipping Service
+    environment:
+      NODE_ENV: production
+      AMQP_URL: amqp://guest:guest@rabbitmq:5672
+    # Restart layanan jika terjadi kegagalan
+    restart: on-failure
+    # Menghubungkan ke jaringan yang ditentukan
+    networks:
+      - rabbitmq_network
+
+# Menentukan jaringan yang digunakan
+networks:
+  rabbitmq_network:
+    name: rabbitmq_network
+    driver: bridge
