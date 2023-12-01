@@ -1,0 +1,2 @@
+Github Packages
+docker pull ghcr.io/mzakyfrz17/a433-microservices/order-service:latest
